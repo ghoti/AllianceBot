@@ -28,14 +28,14 @@ class Notifications():
 
                 toonie = Characters.Characters(name, keyid, vcode, dirkeyid, dirvcode)
                 self.characters.append(toonie)
-        self.conn = sqlite3.connect('static.db')
-        self.c = self.conn.cursor()
+        #self.conn = sqlite3.connect('static.db')
+
 
     def noteid(self):
         return{
-            16:self.application,
-            17:self.denial,
-            18:self.acceptance,
+            #16:self.application,
+            #17:self.denial,
+            #18:self.acceptance,
             45:self.anchoralert,
             46:self.vulnstruct,
             47:self.invulnstruct,
@@ -48,8 +48,8 @@ class Notifications():
             94:self.pocorf,
             96:self.fwwarn,
             97:self.fwkick,
-            111:self.bounty,  #TURNS OUT THIS IS SPAMMY AS FUCK DAMN YOU WATCH YOSELF
-            128:self.joinfweddit #join note is same as app note with different id hue
+            #111:self.bounty,  #TURNS OUT THIS IS SPAMMY AS FUCK DAMN YOU WATCH YOSELF
+            #128:self.joinfweddit #join note is same as app note with different id hue
         }
 
     def bounty(self, id, toon):
@@ -75,7 +75,9 @@ class Notifications():
         return 'Someone was accepted into fweddit!'
     def anchoralert(self, id, toon):
         anchor = self.gettext(id, toon)
-        moon = self.c.execute('select itemName from mapDenormalize where itemID={0}'.format(anchor[id]['moonID']))
+        conn = sqlite3.connect('static.db')
+        c = conn.cursor()
+        moon = c.execute('select itemName from mapDenormalize where itemID={0}'.format(anchor[id]['moonID']))
         moon = moon.fetchone()[0]
         thing = self.c.execute('select typeName from invTypes where typeID={0}'.format(anchor[id]['typeID']))
         thing = thing.fetchone()[0]
@@ -90,7 +92,9 @@ class Notifications():
     def posfuel(self, id, toon):
         #I HAS NO IDEA WHAT INFO IS USEFUL HERE
         pos = self.gettext(id, toon)
-        moon = self.c.execute('select itemName from mapDenormalize where itemID={0}'.format(pos[id]['moonID']))
+        conn = sqlite3.connect('static.db')
+        c = conn.cursor()
+        moon = c.execute('select itemName from mapDenormalize where itemID={0}'.format(pos[id]['moonID']))
         moon = moon.fetchone()[0]
         return 'THE TOWER AT %s NEEDS FUELS PLS - %d remaining' % (moon, pos[id]['- quantity'])
     def tcualert(self, id, toon):
@@ -150,7 +154,7 @@ class Notifications():
                 #timesent = datetime.datetime.strptime(timesent,'%Y-%m-%d %H:%M:%S')
                 timesent = datetime.datetime.fromtimestamp(timesent)
                 #print timesent, now-datetime.timedelta(minutes=60)
-                if timesent > now-datetime.timedelta(days=1):
+                if timesent > now-datetime.timedelta(minutes=30):
                     sendme = self.noteid().get(notes[0][notificationID]['type_id'], '')
                     if sendme:
                         message = sendme(notificationID, toon)

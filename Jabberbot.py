@@ -25,7 +25,7 @@ class MUCBot(sleekxmpp.ClientXMPP):
         self.get_roster()
         self.send_presence()
         if self.roomsecret:
-            self.plugin['xep_0045'].joinMUC(self.room, self.nick, roomsecret=self.password, wait=True)
+            self.plugin['xep_0045'].joinMUC(self.room, self.nick, password=self.roomsecret, wait=True)
         else:
             self.plugin['xep_0045'].joinMUC(self.room, self.nick, wait=True)
 
