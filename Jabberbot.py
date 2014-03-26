@@ -1,5 +1,6 @@
 __author__ = 'ghoti'
 import os
+import importer
 import sleekxmpp
 
 import Notifications
@@ -20,6 +21,7 @@ class MUCBot(sleekxmpp.ClientXMPP):
         self.add_event_handler("muc::{0}::got_online".format(self.room), self.muc_online)
 
         self.n = Notifications.Notifications()
+        self.botcommands = importer.Importer()
 
     def start(self, event):
         self.get_roster()
@@ -34,10 +36,25 @@ class MUCBot(sleekxmpp.ClientXMPP):
 
 
     def muc_message(self, msg):
-        if msg['mucnick'] != self.nick and self.nick in msg['body']:
-            self.send_message(mto=msg['from'].bare,
-                              mbody='I heard that, {0}'.format(msg['mucnick']),
-                              mtype='groupchat')
+        #if msg['mucnick'] != self.nick and self.nick in msg['body']:
+        #    self.send_message(mto=msg['from'].bare,
+        #                      mbody='I heard that, {0}'.format(msg['mucnick']),
+        #                      mtype='groupchat')
+        for regex in self.botcommands.commands.keys():
+           if regex.match(msg['body']):
+            result = self.botcommands.commands[regex](msg['body'])
+            if type(result).__name__ == 'list':
+                for thing in result:
+                    self.send_message(mto=msg['from'].bare,
+                                      mbody=thing,
+                                      mtype='groupchat')
+            else:
+                self.send_message(mto=msg['from'].bare,
+                                  mbody=result,
+                                  mtype='groupchat')
+
+
+
 
     def muc_online(self, presence):
         pass

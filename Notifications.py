@@ -15,21 +15,19 @@ import Characters
 class Notifications():
 
     def __init__(self):
-        config = ConfigParser.ConfigParser()
-        self.characters = []
-        for file in os.listdir('config/characters/'):
-            if file.endswith('.cfg'):
-                config.readfp(open('config/characters/'+file))
-                name = config.get('api', 'CharacterName')
-                keyid = config.get('api', 'keyid')
-                vcode = config.get('api', 'vcode')
-                dirkeyid = config.get('api', 'dirkeyid')
-                dirvcode = config.get('api', 'dirvcode')
+        #config = ConfigParser.ConfigParser()
+        self.characters = Characters.Characters()
+        #for file in os.listdir('config/characters/'):
+        #    if file.endswith('.cfg'):
+        #        config.readfp(open('config/characters/'+file))
+        #        name = config.get('api', 'CharacterName')
+        #        keyid = config.get('api', 'keyid')
+        #        vcode = config.get('api', 'vcode')
+        #        dirkeyid = config.get('api', 'dirkeyid')
+        #        dirvcode = config.get('api', 'dirvcode')
 
-                toonie = Characters.Characters(name, keyid, vcode, dirkeyid, dirvcode)
-                self.characters.append(toonie)
-        #self.conn = sqlite3.connect('static.db')
-
+        #        toonie = Characters.Characters(name, keyid, vcode, dirkeyid, dirvcode)
+        #        self.characters.append(toonie)
 
     def noteid(self):
         return{
@@ -139,7 +137,7 @@ class Notifications():
     def grabnotes(self):
 
         eve = evelink.eve.EVE()
-        for toon in self.characters:
+        for toon in self.characters.getall():
             api = evelink.api.API(api_key=(toon.keyid, toon.vcode))
             id = eve.character_id_from_name(toon.name)
             char = evelink.char.Char(char_id=id, api=api)
