@@ -8,7 +8,7 @@ import sqlite3
 #Returns a list to jabberbot of all poses under each(!) directors command (each corp)
 #WARNING THIS IS SPAMMY IF YOU HAVE A LOT OF POSES JESUS FUCK
 def towers(message):
-    alltowers = []
+    alltowers = ['Current POS states for all poses in each corp:  Data is cached and will not change for 30 minutes!']
     c = Characters.Characters()
     for toon in c.getall():
         #only try to get pos information IF a CORP api is provided, character api's do nothing here
