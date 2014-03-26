@@ -13,6 +13,7 @@ class Characters():
     #    self.dirvcode = dirvcode
 
     def __init__(self):
+        #classception
         class Toon(object):
             def __init__(self, name, keyid, vcode, dirkeyid, dirvcode):
                 self.name = name

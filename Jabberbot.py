@@ -36,10 +36,7 @@ class MUCBot(sleekxmpp.ClientXMPP):
 
 
     def muc_message(self, msg):
-        #if msg['mucnick'] != self.nick and self.nick in msg['body']:
-        #    self.send_message(mto=msg['from'].bare,
-        #                      mbody='I heard that, {0}'.format(msg['mucnick']),
-        #                      mtype='groupchat')
+        #if a command returns a list of items, send each list item individually, otherwise, just send the string
         for regex in self.botcommands.commands.keys():
            if regex.match(msg['body']):
             result = self.botcommands.commands[regex](msg['body'])
@@ -52,9 +49,6 @@ class MUCBot(sleekxmpp.ClientXMPP):
                 self.send_message(mto=msg['from'].bare,
                                   mbody=result,
                                   mtype='groupchat')
-
-
-
 
     def muc_online(self, presence):
         pass
