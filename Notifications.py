@@ -1,13 +1,13 @@
 __author__ = 'ghoti'
 
-import os
-import ConfigParser
 import datetime
 import sqlite3
 import evelink.api
 import evelink.char
 import evelink.eve
 import evelink.corp
+import time
+import logging
 
 import Characters
 
@@ -17,17 +17,7 @@ class Notifications():
     def __init__(self):
         #config = ConfigParser.ConfigParser()
         self.characters = Characters.Characters()
-        #for file in os.listdir('config/characters/'):
-        #    if file.endswith('.cfg'):
-        #        config.readfp(open('config/characters/'+file))
-        #        name = config.get('api', 'CharacterName')
-        #        keyid = config.get('api', 'keyid')
-        #        vcode = config.get('api', 'vcode')
-        #        dirkeyid = config.get('api', 'dirkeyid')
-        #        dirvcode = config.get('api', 'dirvcode')
 
-        #        toonie = Characters.Characters(name, keyid, vcode, dirkeyid, dirvcode)
-        #        self.characters.append(toonie)
 
     def noteid(self):
         return{
@@ -134,31 +124,55 @@ class Notifications():
         return corp.corporation_sheet(corpid)[0]['name']
 
 
-    def grabnotes(self):
+    def grabnotes(self, toon):
 
         eve = evelink.eve.EVE()
-        for toon in self.characters.getall():
-            api = evelink.api.API(api_key=(toon.keyid, toon.vcode))
-            id = eve.character_id_from_name(toon.name)
-            char = evelink.char.Char(char_id=id, api=api)
+        # for toon in self.characters.getall():
+        #     api = evelink.api.API(api_key=(toon.keyid, toon.vcode))
+        #     id = eve.character_id_from_name(toon.name)
+        #     char = evelink.char.Char(char_id=id, api=api)
+        #
+        #     notes = char.notifications()
+        #
+        #     #ccp recently changed how the api caches info, giving a hard time instead of pushing back everytime we call
+        #     toon.apicachetime = int(notes.expires)
+        #
+        #     messages = []
+        #
+        #     for notificationID in notes[0]:
+        #         now = datetime.datetime.now()
+        #
+        #         timesent = notes[0][notificationID]['timestamp']
+        #         #timesent = datetime.datetime.strptime(timesent,'%Y-%m-%d %H:%M:%S')
+        #         timesent = datetime.datetime.fromtimestamp(timesent)
+        #         #print timesent, now-datetime.timedelta(minutes=60)
+        #         if timesent > now-datetime.timedelta(minutes=30):
+        #             sendme = self.noteid().get(notes[0][notificationID]['type_id'], '')
+        #             if sendme:
+        #                 message = sendme(notificationID, toon)
+        #                 self.lastnotification = message
+        #                 #self.send_message(mto=mess['from'].bare, mbody=message, mtype='groupchat')
+        #                 messages.append(message)
+        #     return messages
+        api = evelink.api.API(api_key=(toon.keyid, toon.vcode))
+        id = eve.character_id_from_name(toon.name)
+        char = evelink.char.Char(char_id=id, api=api)
 
-            notes = char.notifications()
-            messages = []
+        notes = char.notifications()
 
-            for notificationID in notes[0]:
-                now = datetime.datetime.now()
+        toon.apicachetime = notes.expires
 
-                timesent = notes[0][notificationID]['timestamp']
-                #timesent = datetime.datetime.strptime(timesent,'%Y-%m-%d %H:%M:%S')
-                timesent = datetime.datetime.fromtimestamp(timesent)
-                #print timesent, now-datetime.timedelta(minutes=60)
-                if timesent > now-datetime.timedelta(minutes=30):
-                    sendme = self.noteid().get(notes[0][notificationID]['type_id'], '')
-                    if sendme:
-                        message = sendme(notificationID, toon)
-                        self.lastnotification = message
-                        #self.send_message(mto=mess['from'].bare, mbody=message, mtype='groupchat')
-                        messages.append(message)
-            return messages
+        messages = []
+
+        for notificationID in notes[0]:
+            timesent = notes[0][notificationID]['timestamp']
+            timesent = datetime.datetime.fromtimestamp(timesent)
+            now = datetime.datetime.now()
+            if timesent > now-datetime.timedelta(minutes=30):
+                sendme = self.noteid().get(notes[0][notificationID]['type_id'], '')
+                if sendme:
+                    message = sendme(notificationID, toon)
+                    messages.append(message)
+        return messages
 
 

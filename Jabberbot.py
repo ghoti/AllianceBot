@@ -2,6 +2,9 @@ __author__ = 'ghoti'
 import os
 import importer
 import sleekxmpp
+import time
+import logging
+
 
 import Notifications
 
@@ -21,6 +24,7 @@ class MUCBot(sleekxmpp.ClientXMPP):
         self.add_event_handler("muc::{0}::got_online".format(self.room), self.muc_online)
 
         self.n = Notifications.Notifications()
+
         self.botcommands = importer.Importer()
 
     def start(self, event):
@@ -31,8 +35,11 @@ class MUCBot(sleekxmpp.ClientXMPP):
         else:
             self.plugin['xep_0045'].joinMUC(self.room, self.nick, wait=True)
 
-        self.notificationrunner()
-        self.schedule('notificationrunner', 1800, self.notificationrunner, repeat=True)
+        #for toon in self.n.characters:
+        #    self.notificationrunner(toon)
+        for toon in self.n.characters.getall():
+            self.notificationrunner(toon)
+        #self.schedule('notificationrunner', 1800, self.notificationrunner, repeat=True)
 
 
     def muc_message(self, msg):
@@ -53,8 +60,10 @@ class MUCBot(sleekxmpp.ClientXMPP):
     def muc_online(self, presence):
         pass
 
-    def notificationrunner(self):
-        messages = self.n.grabnotes()
+    def notificationrunner(self, toon):
+        messages = self.n.grabnotes(toon)
+        self.schedule(toon.name, toon.apicachetime-time.time(), self.notificationrunner, args=(toon), repeat=False)
+        logging.debug('queued {} to run notes in {}'.format(toon.name, toon.apicachetime-time.time()))
         msg=sleekxmpp.Message()
         msg['from'] = self.room + '/' + self.nick
         for message in messages:

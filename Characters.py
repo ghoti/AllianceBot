@@ -21,6 +21,7 @@ class Characters():
                 self.vcode = vcode
                 self.dirkeyid = dirkeyid
                 self.dirvcode = dirvcode
+                self.apicachetime = 0
 
         self.characters = []
         config = ConfigParser.ConfigParser()
@@ -37,3 +38,7 @@ class Characters():
                 self.characters.append(toonie)
     def getall(self):
         return self.characters
+    def getone(self, character):
+        for i in self.characters:
+            if character == i.name:
+                return i
