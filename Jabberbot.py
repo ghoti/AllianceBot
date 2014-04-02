@@ -62,7 +62,7 @@ class MUCBot(sleekxmpp.ClientXMPP):
 
     def notificationrunner(self, toon):
         messages = self.n.grabnotes(toon)
-        self.schedule(toon.name, toon.apicachetime-time.time(), self.notificationrunner, args=(toon), repeat=False)
+        self.schedule(toon.name, toon.apicachetime-time.time(), self.notificationrunner, args=(toon, ))
         logging.debug('queued {} to run notes in {}'.format(toon.name, toon.apicachetime-time.time()))
         msg=sleekxmpp.Message()
         msg['from'] = self.room + '/' + self.nick

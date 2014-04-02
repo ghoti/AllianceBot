@@ -26,7 +26,6 @@ def main():
 
     logging.basicConfig(level=logging.DEBUG, format=('%(levelname)-8s %(message)s'))
 
-    print(server, password, room+'@'+conference, name, roomsecret)
     if roomsecret == '':
         xmpp = Jabberbot.MUCBot(server, password, room+'@'+conference, name, roomsecret=None)
     else:
