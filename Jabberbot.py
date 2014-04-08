@@ -4,6 +4,7 @@ import importer
 import sleekxmpp
 import time
 import logging
+import ConfigParser
 
 
 import Notifications
@@ -16,6 +17,9 @@ class MUCBot(sleekxmpp.ClientXMPP):
         self.room = room
         self.nick = nick
         self.roomsecret = roomsecret
+
+        self.config = ConfigParser.ConfigParser()
+        self.config.readfp(open('config/jabber.cfg'))
 
         self.add_event_handler("session_start", self.start)
 
@@ -37,8 +41,11 @@ class MUCBot(sleekxmpp.ClientXMPP):
 
         #for toon in self.n.characters:
         #    self.notificationrunner(toon)
-        for toon in self.n.characters.getall():
-            self.notificationrunner(toon)
+
+        if self.config.get('jabber', 'notificationbot') == 'True':
+            logging.info('STARTING NOTIFICATION RUNNER FOR LEADERSHIP')
+            for toon in self.n.characters.getall():
+                self.notificationrunner(toon)
         #self.schedule('notificationrunner', 1800, self.notificationrunner, repeat=True)
 
 
@@ -63,7 +70,7 @@ class MUCBot(sleekxmpp.ClientXMPP):
     def notificationrunner(self, toon):
         messages = self.n.grabnotes(toon)
         self.schedule(toon.name, toon.apicachetime-time.time(), self.notificationrunner, args=(toon, ))
-        logging.debug('queued {} to run notes in {}'.format(toon.name, toon.apicachetime-time.time()))
+        logging.info('Queued {} to run notes in {}'.format(toon.name, toon.apicachetime-time.time()))
         msg=sleekxmpp.Message()
         msg['from'] = self.room + '/' + self.nick
         for message in messages:

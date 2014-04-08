@@ -5,3 +5,5 @@ conference =
 room =
 password =
 roomsecret =
+notificationbot = True
+blacklist = test,bettertest
